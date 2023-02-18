@@ -1,0 +1,18 @@
+{
+  "name": "schoolcare",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "collins ruto",
+  "license": "ISC",
+  "dependencies": {
+    "africastalking": "^0.6.0",
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2"
+  }
+}
