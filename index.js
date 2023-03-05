@@ -105,21 +105,21 @@ router.post("/", async (req, res) => {
   });
 
   studentsarr.forEach(async (student) => {
-    const id = student.node.admissionId
+    const id = student.node.admissionId;
     student.node.exams.length &&
       student.node.exams.forEach((exam) => {
-        // console.log("exam res", (`1*${id}*${exam.slug}`))
+        // given text is something like 1*14*2021i
         const orgText = `${id}${text}`;
-        const parts = orgText.split('*')
+        const parts = orgText.split("*");
 
-        const year = parts[2]; // Extract only the last two digits of the year
+        const year = parts[2]; // ie. 2021i
 
-        const convertedDate = `1*${parts[1]}*${id}${year ? year : 0}`; 
+        // combine to form 1*14*142021i ie. id and year and semester as saved in DB
+        const convertedDate = `1*${parts[1]}*${id}${year ? year : 0}`;
 
-        // console.log("exam text 1", `1*${parts[1]}*${id}`);
-        // console.log("exam res 2", `1*${id}*${id}`);
         if (`1*${id}*${exam.slug}` === convertedDate) {
           const results = exam.results;
+          // clean useless data
           delete results["0"];
           delete results["1"];
 
@@ -128,14 +128,24 @@ router.post("/", async (req, res) => {
             .join("\n");
 
           response = `END ${student.node.name} \n Your ${exam.term} results are: \n ${formatResult} `;
-        } 
-       
+        }
+
+        // convert ie 1*14*2021i to 1*14*20 
+        const part2 = year?.substring(0, 2) || 0;
+        console.log("part2", part2);
+        // check if results exist but not for the specific year and semester
+        if (
+          `1*${id}*20` === `1*${parts[1]}*${part2}` &&
+          `1*${id}*${exam.slug}` !== convertedDate
+        ) {
+          response = `END Your results for ${year} have not been uploaded`;
+        }
       });
 
     if (`2*${id}` === text) {
-      console.log("text", text)
+      console.log("text", text);
       console.log("text 2", `2*${id}`);
-      const fees = student.node.fees
+      const fees = student.node.fees;
       let invoice = 0;
       let credit = 0;
 
@@ -146,7 +156,7 @@ router.post("/", async (req, res) => {
       });
 
       const feeBlc = (invoice - credit).toString();
-      console.log("fees", feeBlc)
+      console.log("fees", feeBlc);
       response = `END ${student.node.name} \n Your fee Balance is: \n KES ${feeBlc} `;
     }
   });
