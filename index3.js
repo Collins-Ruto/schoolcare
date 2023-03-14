@@ -59,7 +59,51 @@ router.post("/", async (req, res) => {
     }
   };
 
+  const getLessons = async (req, res) => {
+    try {
+      const query = gql`
+        query MyQuery {
+          lessonsConnection(first: 20, orderBy: publishedAt_ASC) {
+            edges {
+              node {
+                day
+                endTime
+                id
+                startTime
+                stream {
+                  ... on Stream {
+                    name
+                    slug
+                  }
+                }
+                subject {
+                  ... on Subject {
+                    name
+                    slug
+                  }
+                }
+                teacher {
+                  ... on Teacher {
+                    name
+                    slug
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const result = await request(graphqlAPI, query);
+
+      return result.lessonsConnection.edges;
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   const studentsarr = await getStudents();
+  const lessonsarr = await getLessons();
 
   console.log("####################", req.body);
   let response = "";
