@@ -12,6 +12,10 @@ router.post("/", async (req, res) => {
   // Read variables sent via POST from our SDK
   const { sessionId, serviceCode, phoneNumber, text } = req.body;
 
+  const units = ["1. Chemistry 1", "2. Algebra 1", "3. Calculus 1", "4. Electronics 1", "5. Physics 1", "6. Programming"]
+  const units2 = ["1. Chemistry 2", "2. Solids 1", "3. Materials 1", "4. Power 1", "5. Research Methods", "6. Computer systems"]
+  const register = []
+
   const getStudents = async () => {
     console.log("initiated");
 
@@ -113,6 +117,8 @@ router.post("/", async (req, res) => {
       response = `CON What would you like to check
       1. Results
       2. Fee Balance
+      3. Classes Today
+      4. Unit Registration
       `;
       break;
     case "1":
@@ -124,12 +130,25 @@ router.post("/", async (req, res) => {
       response = ` CON Enter Admission number
       `;
       break;
+    
+    case "3":
+      response = ` CON Enter Admission number
+      `;
+      break;
+    
+    case "4":
+      response = ` CON Enter Admission number
+      `;
+      break;
+    case "5":
+      response = ` CON Enter Admission number
+      `;
+      break;
 
     case "1*1":
       response = `CON Input year and semester
       `;
       break;
-
     default:
       response = `CON What would you like to check
       1. Results
@@ -150,11 +169,11 @@ router.post("/", async (req, res) => {
 
   studentsarr.forEach(async (student) => {
     const id = student.node.admissionId;
+    const orgText = `${id}${text}`;
+    const parts = orgText.split("*");
     student.node.exams.length &&
       student.node.exams.forEach((exam) => {
         // given text is something like 1*14*2021i
-        const orgText = `${id}${text}`;
-        const parts = orgText.split("*");
 
         const year = parts[2]; // ie. 2021i
 
@@ -202,6 +221,58 @@ router.post("/", async (req, res) => {
       const feeBlc = (invoice - credit).toString();
       console.log("fees", feeBlc)
       response = `END ${student.node.name} \n Your fee Balance is: \n KES ${feeBlc} `;
+    }
+
+    if (`3*${id}` === text) {
+      console.log("text 3", text);
+      console.log("text 3", `3*${id}`);
+      let myLessons = 'subject      teacher     start     end\n';
+      lessonsarr.forEach((lesson) => {
+        if (lesson.node.stream.slug === student.node.stream.slug) {
+          myLessons = myLessons + `${lesson.node.subject.name}  ${lesson.node.teacher.name}  ${lesson.node.startTime}  ${lesson.node.endTime}\n`;
+        }
+      })
+  
+      response = `END ${student.node.name} \n Your lessons for today are: \n ${myLessons} `;
+    }
+
+    if (`4*${id}` === text) {
+      console.log("text 4", text);
+      console.log("text 4", `4*${id}`);
+      let myUnits = 'Type the number of units to be registered separated by comma. \n Type "all" to register  all \n';
+      units.forEach((unit, index) => {
+          myUnits = myUnits + ` ${unit}${(index % 2 === 0)? " " : " \n"}`;
+      })
+      response = `CON ${student.node.name} \n ${myUnits} `;
+    }
+
+    if (`5*${id}` === text) {
+      console.log("text 4", `4*${id}`);
+      register.forEach((sdt) => {
+        if (id === sdt.id) {
+          
+          response = `END ${student.node.name} \n ${sdt.units} `;
+        }
+      })
+    }
+
+    const resText = text.split("*");
+
+    if (resText[2]) {
+      console.log("parts 4", (text.split("*")));
+      console.log("text 4", `${resText[2]}`);
+      let textUnits = resText[2].split(",");
+      let regUnits = ""
+      textUnits.forEach((unit) => {
+        regUnits = regUnits + units[unit - 1]
+      });
+      console.log("reg units", regUnits)
+      register.push({ id: id, units: regUnits });
+      if (resText[2] === "all") {
+        register.push({ id: id, units: units });
+        
+      }
+      response = `END Success `;
     }
   });
 

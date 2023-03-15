@@ -1,5 +1,5 @@
 import express from "express";
-import ussdRoute from "./index.js";
+import ussdRoute from "./index3.js";
 import bodyParser from "body-parser";
 import dotenv from 'dotenv'
 
