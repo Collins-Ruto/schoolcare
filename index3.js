@@ -258,7 +258,7 @@ router.post("/", async (req, res) => {
 
     const resText = text.split("*");
 
-    if (resText[2]) {
+    if (resText[0] === "4" && resText[2]) {
       console.log("parts 4", (text.split("*")));
       console.log("text 4", `${resText[2]}`);
       let textUnits = resText[2].split(",");
