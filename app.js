@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 // import mongodb from "mongodb";
 import examRoutes from "./routes/examRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
+// import
 
 dotenv.config()
 

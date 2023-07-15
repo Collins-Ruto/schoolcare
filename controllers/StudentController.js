@@ -1,11 +1,16 @@
-import Student from "../models/StudentModel.js";
-// import mongodb from "mongodb";
+import prisma from '../prisma/index.js'
 
 export const getAllStudents = async () => {
   try {
-      const students = await Student.find();
+      const students = await prisma.student.findMany({
+        include: {
+          stream: true,
+          exams: true,
+          fees: true,
+        },
+      });
       
-      console.log(students);
+    //   console.log(students);
 
     return students;
   } catch (error) {

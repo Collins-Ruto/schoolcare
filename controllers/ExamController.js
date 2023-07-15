@@ -1,11 +1,10 @@
-import Exam from "../models/ExamModel.js";
-// import mongodb from "mongodb";
+import prisma from '../prisma/index.js'
 
 export const getAllExams = async () => {
   try {
-      const exams = await Exam.find();
+      const exams = await prisma.exam.findMany();
       
-      console.log(exams);
+    //   console.log(exams);
 
     return exams;
   } catch (error) {
