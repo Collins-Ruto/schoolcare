@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "prisma generate",
     "start": "nodemon app.js"
   },
   "author": "collins ruto",
@@ -27,5 +28,8 @@
   },
   "devDependencies": {
     "prisma": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }
