@@ -14,7 +14,6 @@ export const getAllLessons = async () => {
     await redis.set("allLessons", JSON.stringify(lessons));
 
     console.log("db lessons", lessons);
-
       
     //   console.log(lessons);
 
