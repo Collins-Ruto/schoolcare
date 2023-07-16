@@ -1,5 +1,5 @@
 import Student from "../models/StudentModel.js";
-import prisma from "../prisma/index.js";
+import prisma from "../../prisma/index.js";
 import { redis } from "../lib/redis.js";
 
 export const getAllStudents = async () => {

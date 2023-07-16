@@ -27,6 +27,7 @@
     "nanny-state": "^7.6.1"
   },
   "devDependencies": {
+    "nodemon": "^3.0.1",
     "prisma": "^5.0.0"
   },
   "engines": {
