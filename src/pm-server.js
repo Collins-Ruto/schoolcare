@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { getAllExams } from "./controllers/ExamController.js";
+// import { getAllExams } from "./controllers/ExamController.js";
 import { getAllStudents } from "./controllers/StudentController.js";
 import { getAllLessons } from "./controllers/LessonController.js";
 
@@ -20,26 +20,21 @@ router.post("/", async (req, res) => {
     "5. Physics 1",
     "6. Programming",
   ];
-  const units2 = [
-    "1. Chemistry 2",
-    "2. Solids 1",
-    "3. Materials 1",
-    "4. Power 1",
-    "5. Research Methods",
-    "6. Computer systems",
-  ];
+
   const register = [];
 
   // const allExams = await getAllExams();
   const allStudents = await getAllStudents();
   const allLessons = await getAllLessons();
-  // const allLessons = [];
 
   // console.log("all exams", allExams);
+  // console.log("all lessons", allLessons);
   // console.log("all students", allStudents);
 
   console.log("####################", req.body);
   let response = "";
+
+  // match users selection. first request is ""
 
   switch (text) {
     case "":
@@ -47,30 +42,10 @@ router.post("/", async (req, res) => {
       1. Results
       2. Fee Balance
       3. Classes Today
-      4. Unit Registration
       `;
       break;
-    case "1":
+    case "1" || "2" || "3":
       response = `CON Enter admission number
-      `;
-      break;
-
-    case "2":
-      response = `CON Enter Admission number
-      `;
-      break;
-
-    case "3":
-      response = `CON Enter Admission number
-      `;
-      break;
-
-    case "4":
-      response = `CON Enter Admission number
-      `;
-      break;
-    case "5":
-      response = `CON Enter Admission number
       `;
       break;
 
@@ -82,6 +57,7 @@ router.post("/", async (req, res) => {
       response = `CON What would you like to check
       1. Results
       2. Fees
+      3. Classes Today
       `;
       break;
   }
@@ -96,6 +72,8 @@ router.post("/", async (req, res) => {
         (student) => student.admissionId === textStudentId
       );
 
+      // Check is student exists in DB using ADM ID
+
       if (!student) {
         response = `END Invalid Admission ID\nPlease enter a valid Admission ID\nor contact your college administrator.`;
         return;
@@ -103,7 +81,7 @@ router.post("/", async (req, res) => {
 
       const id = student.admissionId;
 
-      console.log(student);
+      // Get Check if user's exam results exist per ADM ID
 
       if (`1*${student.admissionId}` === text) {
         if (student.exams.length < 1) {
@@ -112,6 +90,8 @@ router.post("/", async (req, res) => {
           response = `CON Input year and semester`;
         }
       }
+
+      // Get user's exam results per ADM ID
 
       if ("1" === textCheck) {
         student.exams.some((exam) => {
@@ -150,6 +130,8 @@ router.post("/", async (req, res) => {
         });
       }
 
+      // Get user's fee balance per ADM ID
+
       if (`2` === textCheck) {
         console.log("text", text);
         console.log("text 2", `2*${id}`);
@@ -168,6 +150,8 @@ router.post("/", async (req, res) => {
         response = `END ${student.name} \n Your fee Balance is: \n KES ${feeBlc} `;
       }
 
+      // Get Lessons per user's Stream
+
       if (`3` === textCheck) {
         console.log("text 3", text);
         console.log("text 3", `3*${id}`);
@@ -180,7 +164,7 @@ router.post("/", async (req, res) => {
           }
         });
 
-        response = `END ${student.name} \n Your lessons for today are: \n ${myLessons} `;
+        response = `END ${student.name} \nYour lessons for today are: \n${myLessons} `;
       }
 
       if (`4*${id}` === text) {
@@ -206,8 +190,8 @@ router.post("/", async (req, res) => {
       const resText = text.split("*");
 
       if (resText[0] === "4" && resText[2]) {
-        console.log("parts 4", text.split("*"));
-        console.log("text 4", `${resText[2]}`);
+        // console.log("parts 4", text.split("*"));
+        // console.log("text 4", `${resText[2]}`);
         let textUnits = resText[2].split(",");
         let regUnits = "";
         textUnits.forEach((unit) => {
@@ -224,12 +208,6 @@ router.post("/", async (req, res) => {
   }
 
   processRequest();
-
-  // allStudents.some(async (student, index) => {
-  //   console.log("stdnt", index)
-  //   const id = student.admissionId;
-
-  // });
 
   // Print the response onto the page so that our SDK can read it
   console.log("response", response);
