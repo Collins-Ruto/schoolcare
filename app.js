@@ -1,13 +1,12 @@
 import express from "express";
-import ussdRoute from "./index3.js";
 import bodyParser from "body-parser";
 import dotenv from 'dotenv'
 import cors from "cors";
 import mongoose from "mongoose";
 // import mongodb from "mongodb";
-import examRoutes from "./routes/examRoutes.js";
-import studentRoutes from "./routes/studentRoutes.js";
-// import
+import ussdRoute from "./src/pm-server.js";
+import examRoutes from "./src/routes/examRoutes.js";
+import studentRoutes from "./src/routes/studentRoutes.js";
 
 dotenv.config()
 
@@ -22,7 +21,7 @@ app.use(cors());
 // app.use(urlencoded({ extended: false }));
 
 app.use("/", ussdRoute);
-app.use("/exams", examRoutes);
+// app.use("/exams", examRoutes);
 app.use("/students", studentRoutes);
 
 mongoose

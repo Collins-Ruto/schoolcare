@@ -1,12 +1,10 @@
 import express from "express";
-import { GraphQLClient, request, gql } from "graphql-request";
 import dotenv from "dotenv";
+import { getAllExams } from "./controllers/ExamController.js";
+import { getAllStudents } from "./controllers/StudentController.js";
+import { getAllLessons } from "./controllers/LessonController.js";
 
 dotenv.config();
-
-const graphqlAPI =
-  "https://api-eu-central-1-shared-euc1-02.hygraph.com/v2/cle2syke34vja01um747d0nxv/master" ||
-  process.env.GRAPHCMS_API;
 
 const router = express.Router();
 
@@ -32,98 +30,13 @@ router.post("/", async (req, res) => {
   ];
   const register = [];
 
-  const getStudents = async () => {
-    console.log("initiated");
+  // const allExams = await getAllExams();
+  const allStudents = await getAllStudents();
+  const allLessons = await getAllLessons();
+  // const allLessons = [];
 
-    try {
-      const query = gql`
-        query MyQuery {
-          studentsConnection(first: 20, orderBy: publishedAt_ASC) {
-            edges {
-              node {
-                admissionId
-                name
-                slug
-                exams {
-                  examDate
-                  id
-                  name
-                  results
-                  slug
-                  term
-                }
-                fees {
-                  amount
-                  payday
-                  type
-                  term
-                  slug
-                }
-                stream {
-                  ... on Stream {
-                    slug
-                    name
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
-
-      const result = await request(graphqlAPI, query);
-
-      return result.studentsConnection.edges;
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const getLessons = async (req, res) => {
-    try {
-      const query = gql`
-        query MyQuery {
-          lessonsConnection(first: 20, orderBy: publishedAt_ASC) {
-            edges {
-              node {
-                day
-                endTime
-                id
-                startTime
-                stream {
-                  ... on Stream {
-                    name
-                    slug
-                  }
-                }
-                subject {
-                  ... on Subject {
-                    name
-                    slug
-                  }
-                }
-                teacher {
-                  ... on Teacher {
-                    name
-                    slug
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
-
-      const result = await request(graphqlAPI, query);
-
-      return result.lessonsConnection.edges;
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const studentsarr = await getStudents();
-  const lessonsarr = await getLessons();
+  // console.log("all exams", allExams);
+  // console.log("all students", allStudents);
 
   console.log("####################", req.body);
   let response = "";
@@ -138,26 +51,26 @@ router.post("/", async (req, res) => {
       `;
       break;
     case "1":
-      response = ` CON Enter admission number
+      response = `CON Enter admission number
       `;
       break;
 
     case "2":
-      response = ` CON Enter Admission number
+      response = `CON Enter Admission number
       `;
       break;
 
     case "3":
-      response = ` CON Enter Admission number
+      response = `CON Enter Admission number
       `;
       break;
 
     case "4":
-      response = ` CON Enter Admission number
+      response = `CON Enter Admission number
       `;
       break;
     case "5":
-      response = ` CON Enter Admission number
+      response = `CON Enter Admission number
       `;
       break;
 
@@ -173,9 +86,9 @@ router.post("/", async (req, res) => {
       break;
   }
 
-  studentsarr.forEach((student) => {
-    if (`1*${student.node.admissionId}` === text) {
-      if (student.node.exams.length < 1) {
+  allStudents.forEach((student) => {
+    if (`1*${student.admissionId}` === text) {
+      if (student.exams.length < 1) {
         response = `END Your results have not been uploaded`;
       } else {
         response = `CON Input year and semester`;
@@ -183,12 +96,12 @@ router.post("/", async (req, res) => {
     }
   });
 
-  studentsarr.forEach(async (student) => {
-    const id = student.node.admissionId;
+  allStudents.forEach(async (student) => {
+    const id = student.admissionId;
     const orgText = `${id}${text}`;
     const parts = orgText.split("*");
-    student.node.exams.length &&
-      student.node.exams.forEach((exam) => {
+    student.exams.length &&
+      student.exams.forEach((exam) => {
         // given text is something like 1*14*2021i
 
         const year = parts[2]; // ie. 2021i
@@ -206,7 +119,7 @@ router.post("/", async (req, res) => {
             .map((key) => `${key}: ${results[key]}`)
             .join("\n");
 
-          response = `END ${student.node.name} \n Your ${exam.term} results are: \n ${formatResult} `;
+          response = `END ${student.name} \n Your ${exam.term} results are: \n ${formatResult} `;
         }
 
         // convert ie 1*14*2021i to 1*14*20
@@ -224,7 +137,7 @@ router.post("/", async (req, res) => {
     if (`2*${id}` === text) {
       console.log("text", text);
       console.log("text 2", `2*${id}`);
-      const fees = student.node.fees;
+      const fees = student.fees;
       let invoice = 0;
       let credit = 0;
 
@@ -236,22 +149,22 @@ router.post("/", async (req, res) => {
 
       const feeBlc = (invoice - credit).toString();
       console.log("fees", feeBlc);
-      response = `END ${student.node.name} \n Your fee Balance is: \n KES ${feeBlc} `;
+      response = `END ${student.name} \n Your fee Balance is: \n KES ${feeBlc} `;
     }
 
     if (`3*${id}` === text) {
       console.log("text 3", text);
       console.log("text 3", `3*${id}`);
       let myLessons = "subject      teacher     start     end\n";
-      lessonsarr.forEach((lesson) => {
-        if (lesson.node.stream.slug === student.node.stream.slug) {
+      allLessons.forEach((lesson) => {
+        if (lesson.stream.slug === student.stream.slug) {
           myLessons =
             myLessons +
-            `${lesson.node.subject.name}  ${lesson.node.teacher.name}  ${lesson.node.startTime}  ${lesson.node.endTime}\n`;
+            `${lesson.subject.name}  ${lesson.teacher.name}  ${lesson.startTime}  ${lesson.endTime}\n`;
         }
       });
 
-      response = `END ${student.node.name} \n Your lessons for today are: \n ${myLessons} `;
+      response = `END ${student.name} \n Your lessons for today are: \n ${myLessons} `;
     }
 
     if (`4*${id}` === text) {
@@ -262,21 +175,21 @@ router.post("/", async (req, res) => {
       units.forEach((unit, index) => {
         myUnits = myUnits + ` ${unit}${index % 2 === 0 ? " " : " \n"}`;
       });
-      response = `CON ${student.node.name} \n ${myUnits} `;
+      response = `CON ${student.name} \n ${myUnits} `;
     }
 
     if (`5*${id}` === text) {
       console.log("text 4", `4*${id}`);
       register.forEach((sdt) => {
         if (id === sdt.id) {
-          response = `END ${student.node.name} \n ${sdt.units} `;
+          response = `END ${student.name} \n ${sdt.units} `;
         }
       });
     }
 
     const resText = text.split("*");
 
-    if (resText[2]) {
+    if (resText[0] === "4" && resText[2]) {
       console.log("parts 4", text.split("*"));
       console.log("text 4", `${resText[2]}`);
       let textUnits = resText[2].split(",");
@@ -294,6 +207,7 @@ router.post("/", async (req, res) => {
   });
 
   // Print the response onto the page so that our SDK can read it
+  console.log("response", response);
   res.set("Content-Type: text/plain");
   res.send(response);
   // DONE!!!
